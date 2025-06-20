@@ -121,86 +121,233 @@ const char *htmlHomePage PROGMEM = R"HTMLHOMEPAGE(
 <html>  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <title>Robot Arm Control - Team NTD</title>
-    <style>
+  <title>Robot Arm Control - Team NTD</title>    <style>
+    /* Mobile-first responsive design */
+    * {
+      box-sizing: border-box;
+    }
 
-    input[type=button]
-    {
-      background-color:red;color:white;border-radius:30px;width:100%;height:40px;font-size:20px;text-align:center;
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      padding: 10px;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+    }
+
+    input[type=button] {
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      width: 100%;
+      height: 45px;
+      font-size: 16px;
+      font-weight: bold;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    input[type=button]:active {
+      transform: scale(0.95);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+
+    input[type=button]:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    /* Responsive tables */
+    table {
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto;
+      table-layout: fixed;
+      border-spacing: 8px;
+    }
+
+    @media (max-width: 480px) {
+      table {
+        max-width: 95vw;
+        border-spacing: 5px;
+      }
+      
+      input[type=button] {
+        height: 50px;
+        font-size: 18px;
+      }
+      
+      .slider {
+        height: 35px !important;
+      }
+      
+      .slider::-webkit-slider-thumb {
+        width: 50px !important;
+        height: 50px !important;
+      }
     }
         
     .noselect {
-      -webkit-touch-callout: none; /* iOS Safari */
-        -webkit-user-select: none; /* Safari */
-         -khtml-user-select: none; /* Konqueror HTML */
-           -moz-user-select: none; /* Firefox */
-            -ms-user-select: none; /* Internet Explorer/Edge */
-                user-select: none; /* Non-prefixed version, currently
-                                      supported by Chrome and Opera */
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
     }
 
     .slidecontainer {
       width: 100%;
+      padding: 5px;
     }
 
     .slider {
       -webkit-appearance: none;
       width: 100%;
-      height: 20px;
-      border-radius: 5px;
-      background: #d3d3d3;
+      height: 25px;
+      border-radius: 15px;
+      background: #ddd;
       outline: none;
-      opacity: 0.7;
-      -webkit-transition: .2s;
-      transition: opacity .2s;
+      opacity: 0.8;
+      transition: all 0.3s;
+      touch-action: manipulation;
     }
 
-    .slider:hover {
+    .slider:hover, .slider:focus {
       opacity: 1;
+      background: #ccc;
     }
   
     .slider::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
-      width: 40px;
-      height: 40px;
+      width: 45px;
+      height: 45px;
       border-radius: 50%;
-      background: red;
+      background: #e74c3c;
       cursor: pointer;
-    }    
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      transition: all 0.3s;
+    }
+    
+    .slider::-webkit-slider-thumb:hover {
+      background: #c0392b;
+      transform: scale(1.1);
+    }
+    
     .slider::-moz-range-thumb {
-      width: 40px;
-      height: 40px;
+      width: 45px;
+      height: 45px;
       border-radius: 50%;
-      background: red;
+      background: #e74c3c;
       cursor: pointer;
+      border: none;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     }
     
     #ws-status {
-      margin: 10px auto;
-      width: 250px;
+      margin: 15px auto;
+      width: 90%;
+      max-width: 300px;
       font-weight: bold;
-      font-size: 14px;
+      font-size: 16px;
       color: white;
-      border-radius: 8px;
-      background: #888;
-      padding: 8px 12px;
-      transition: background 0.3s;
+      border-radius: 12px;
+      background: #7f8c8d;
+      padding: 12px 16px;
+      transition: all 0.4s ease;
       text-align: center;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      position: relative;
+      overflow: hidden;
     }
-    .ws-connected { background: #27ae60 !important; }
-    .ws-connecting { background: #f39c12 !important; }
-    .ws-disconnected { background: #e74c3c !important; }
-    .ws-error { background: #c0392b !important; }
+    
+    #ws-status::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.5s;
+    }
+    
+    .ws-connected::before { left: 100%; }
+    
+    .ws-connected { 
+      background: linear-gradient(45deg, #27ae60, #2ecc71);
+      animation: pulse 2s infinite;
+    }
+    .ws-connecting { 
+      background: linear-gradient(45deg, #f39c12, #e67e22);
+      animation: connecting 1.5s infinite;
+    }
+    .ws-disconnected { 
+      background: linear-gradient(45deg, #e74c3c, #c0392b);
+      animation: shake 0.5s;
+    }
+    .ws-error { 
+      background: linear-gradient(45deg, #8e44ad, #9b59b6);
+      animation: shake 0.5s;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    @keyframes connecting {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    /* Car control buttons */
+    .car-btn-forward { background: linear-gradient(45deg, #27ae60, #2ecc71) !important; }
+    .car-btn-backward { background: linear-gradient(45deg, #e67e22, #f39c12) !important; }
+    .car-btn-left, .car-btn-right { background: linear-gradient(45deg, #3498db, #2980b9) !important; }
+    .car-btn-stop { background: linear-gradient(45deg, #e74c3c, #c0392b) !important; }
+
+    /* Responsive typography */
+    h1, h2 {
+      margin: 10px 0;
+      color: #2c3e50;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    }
+
+    h1 { font-size: 2.2em; }
+    h2 { font-size: 1.4em; color: #34495e; }
+
+    @media (max-width: 480px) {
+      h1 { font-size: 1.8em; }
+      h2 { font-size: 1.2em; }
+      
+      body { padding: 5px; }
+      
+      #ws-status {
+        font-size: 14px;
+        padding: 10px;
+      }
+    }
 
     </style>
-  
-  </head>  <body class="noselect" align="center" style="background-color:white">
+    </head>
+  <body class="noselect">
      
-    <div id="ws-status" class="ws-connecting">WebSocket: Đang kết nối...</div>
-    <h1 style="color: teal;text-align:center;">Robot Arm Control</h1>
-    <h2 style="color: teal;text-align:center;">Team NTD</h2>
+    <div id="ws-status" class="ws-connecting">🔗 WebSocket: Đang kết nối...</div>
+    <h1>🤖 Robot Arm Control</h1>
+    <h2>Team NTD</h2>
     
     <table id="mainTable" style="width:400px;margin:auto;table-layout:fixed" CELLSPACING=10>
       <tr/><tr/>
@@ -254,45 +401,52 @@ const char *htmlHomePage PROGMEM = R"HTMLHOMEPAGE(
         <td><input type="button" id="Play" value="OFF" ontouchend='onclickButton(this)'></td>
         <td></td>      </tr>      
     </table>
-    
-    <!-- Bảng điều khiển xe 3 bánh -->
-    <h2 style="color: #2c3e50;text-align:center;margin-top:30px;">Điều khiển xe 3 bánh</h2>
-    <table id="carTable" style="width:350px;margin:auto;table-layout:fixed;margin-top:20px;" CELLSPACING=10>
+      <!-- Bảng điều khiển xe 3 bánh -->
+    <h2>🚗 Điều khiển xe 3 bánh</h2>
+    <table id="carTable">
       <tr>
         <td></td>
         <td style="text-align:center;">
-          <input type="button" value="TIẾN" onmousedown='sendCarCommand("FORWARD")' onmouseup='sendCarCommand("STOP")' ontouchstart='sendCarCommand("FORWARD")' ontouchend='sendCarCommand("STOP")' style="background-color:#27ae60;width:100%;height:50px;font-size:18px;font-weight:bold;border-radius:10px;color:white;">
-        </td>
-        <td></td>
-      </tr>
-      <tr>
-        <td style="text-align:center;">
-          <input type="button" value="TRÁI" onmousedown='sendCarCommand("LEFT")' onmouseup='sendCarCommand("STOP")' ontouchstart='sendCarCommand("LEFT")' ontouchend='sendCarCommand("STOP")' style="background-color:#3498db;width:100%;height:50px;font-size:18px;font-weight:bold;border-radius:10px;color:white;">
-        </td>
-        <td style="text-align:center;">
-          <input type="button" value="DỪNG" onclick='sendCarCommand("STOP")' style="background-color:#e74c3c;width:100%;height:50px;font-size:18px;font-weight:bold;border-radius:10px;color:white;">
-        </td>
-        <td style="text-align:center;">
-          <input type="button" value="PHẢI" onmousedown='sendCarCommand("RIGHT")' onmouseup='sendCarCommand("STOP")' ontouchstart='sendCarCommand("RIGHT")' ontouchend='sendCarCommand("STOP")' style="background-color:#3498db;width:100%;height:50px;font-size:18px;font-weight:bold;border-radius:10px;color:white;">
-        </td>
-      </tr>
-      <tr>
-        <td></td>
-        <td style="text-align:center;">
-          <input type="button" value="LÙI" onmousedown='sendCarCommand("BACKWARD")' onmouseup='sendCarCommand("STOP")' ontouchstart='sendCarCommand("BACKWARD")' ontouchend='sendCarCommand("STOP")' style="background-color:#e67e22;width:100%;height:50px;font-size:18px;font-weight:bold;border-radius:10px;color:white;">
+          <input type="button" value="⬆️ TIẾN" class="car-btn-forward" onmousedown='sendCarCommand("FORWARD")' onmouseup='sendCarCommand("STOP")' ontouchstart='sendCarCommand("FORWARD")' ontouchend='sendCarCommand("STOP")'>
         </td>
         <td></td>
       </tr>
       <tr>
-        <td colspan="3" style="text-align:center;padding-top:15px;">
-          <label style="font-size:16px;font-weight:bold;color:#2c3e50;">Tốc độ: </label>
-          <input type="range" min="0" max="255" value="150" id="speed" style="width:200px;" oninput='updateSpeed(this.value)'>
-          <span id="speedValue" style="font-size:16px;font-weight:bold;color:#e74c3c;">150</span>
+        <td style="text-align:center;">
+          <input type="button" value="⬅️ TRÁI" class="car-btn-left" onmousedown='sendCarCommand("LEFT")' onmouseup='sendCarCommand("STOP")' ontouchstart='sendCarCommand("LEFT")' ontouchend='sendCarCommand("STOP")'>
+        </td>
+        <td style="text-align:center;">
+          <input type="button" value="🛑 DỪNG" class="car-btn-stop" onclick='sendCarCommand("STOP")'>
+        </td>
+        <td style="text-align:center;">
+          <input type="button" value="➡️ PHẢI" class="car-btn-right" onmousedown='sendCarCommand("RIGHT")' onmouseup='sendCarCommand("STOP")' ontouchstart='sendCarCommand("RIGHT")' ontouchend='sendCarCommand("STOP")'>
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td style="text-align:center;">
+          <input type="button" value="⬇️ LÙI" class="car-btn-backward" onmousedown='sendCarCommand("BACKWARD")' onmouseup='sendCarCommand("STOP")' ontouchstart='sendCarCommand("BACKWARD")' ontouchend='sendCarCommand("STOP")'>
+        </td>
+        <td></td>
+      </tr>
+      <tr>
+        <td colspan="3" style="text-align:center;padding-top:20px;">
+          <div style="background:white;padding:15px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+            <label style="font-size:18px;font-weight:bold;color:#2c3e50;display:block;margin-bottom:8px;">⚡ Tốc độ:</label>
+            <div class="slidecontainer">
+              <input type="range" min="0" max="255" value="150" id="speed" class="slider" oninput='updateSpeed(this.value)'>
+            </div>
+            <span id="speedValue" style="font-size:20px;font-weight:bold;color:#e74c3c;margin-top:5px;display:inline-block;">150</span>
+          </div>
         </td>
       </tr>
     </table><script>
       var webSocketRobotArmInputUrl = "ws:\/\/" + window.location.hostname + ":81";      
       var websocketRobotArmInput;
+        // Enhanced WebSocket handling for mobile
+      var reconnectAttempts = 0;
+      var maxReconnectAttempts = 10;
+      var reconnectDelay = 2000;
       
       function setWebSocketStatus(statusText, className) {
         var statusElement = document.getElementById('ws-status');
@@ -301,24 +455,30 @@ const char *htmlHomePage PROGMEM = R"HTMLHOMEPAGE(
           statusElement.className = className;
         }
       }
-        function initRobotArmInputWebSocket() 
-      {
-        setWebSocketStatus('WebSocket: Đang kết nối...', 'ws-connecting');
+      
+      function initRobotArmInputWebSocket() {
+        setWebSocketStatus('🔗 Đang kết nối...', 'ws-connecting');
         
         websocketRobotArmInput = new WebSocket(webSocketRobotArmInputUrl);
-          websocketRobotArmInput.onopen = function(event){
-          setWebSocketStatus('WebSocket: Đã kết nối', 'ws-connected');
+        
+        websocketRobotArmInput.onopen = function(event){
+          setWebSocketStatus('✅ Đã kết nối', 'ws-connected');
           console.log('WebSocket connected successfully');
+          reconnectAttempts = 0;
         };
         
         websocketRobotArmInput.onclose = function(event){
-          setWebSocketStatus('WebSocket: Mất kết nối - Đang thử lại...', 'ws-disconnected');
-          console.log('WebSocket disconnected, attempting to reconnect...');
-          setTimeout(initRobotArmInputWebSocket, 2000);
+          if (reconnectAttempts < maxReconnectAttempts) {
+            reconnectAttempts++;
+            setWebSocketStatus(`🔄 Kết nối lại... (${reconnectAttempts}/${maxReconnectAttempts})`, 'ws-connecting');
+            setTimeout(initRobotArmInputWebSocket, reconnectDelay);
+          } else {
+            setWebSocketStatus('❌ Kết nối thất bại', 'ws-error');
+          }
         };
         
         websocketRobotArmInput.onerror = function(event){
-          setWebSocketStatus('WebSocket: Lỗi kết nối', 'ws-error');
+          setWebSocketStatus('⚠️ Lỗi kết nối', 'ws-error');
           console.log('WebSocket error:', event);
         };
         
@@ -332,30 +492,87 @@ const char *htmlHomePage PROGMEM = R"HTMLHOMEPAGE(
             {
               button.style.backgroundColor = (button.value == "ON" ? "green" : "red");  
               enableDisableButtonsSliders(button);
-            }
-          }
-        };      }
+            }          }
+        };
+      }
       
-      // Hàm gửi lệnh điều khiển xe
+      // Enhanced car command function with mobile optimization
       function sendCarCommand(command) {
+        if (!websocketRobotArmInput || websocketRobotArmInput.readyState !== WebSocket.OPEN) {
+          console.log('WebSocket not connected, attempting to reconnect...');
+          initRobotArmInputWebSocket();
+          return;
+        }
+        
         var speed = document.getElementById('speed').value;
         var data = "CAR," + command + "," + speed;
         console.log('Sending car command:', data);
-        websocketRobotArmInput.send(data);
+        
+        try {
+          websocketRobotArmInput.send(data);
+          
+          // Visual feedback for mobile users
+          var activeButton = document.querySelector(`input[value*="${command}"]`);
+          if (activeButton) {
+            activeButton.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+              activeButton.style.transform = 'scale(1)';
+            }, 150);
+          }
+          
+        } catch (error) {
+          console.log('Error sending command:', error);
+          setWebSocketStatus('⚠️ Lỗi gửi lệnh', 'ws-error');
+        }
       }
-      
-      // Hàm cập nhật tốc độ
+        // Enhanced speed update with visual feedback
       function updateSpeed(value) {
         document.getElementById('speedValue').textContent = value;
-        // Gửi tốc độ mới nếu xe đang di chuyển
+        
+        // Visual feedback for speed change
+        var speedDisplay = document.getElementById('speedValue');
+        speedDisplay.style.transform = 'scale(1.2)';
+        speedDisplay.style.color = '#e74c3c';
+        setTimeout(() => {
+          speedDisplay.style.transform = 'scale(1)';
+          speedDisplay.style.color = '#e74c3c';
+        }, 200);
+        
         console.log('Speed updated to:', value);
       }
       
-      function sendButtonInput(key, value) 
-      {
+      function sendButtonInput(key, value) {
+        if (!websocketRobotArmInput || websocketRobotArmInput.readyState !== WebSocket.OPEN) {
+          console.log('WebSocket not connected for button input');
+          return;
+        }
         var data = key + "," + value;
         websocketRobotArmInput.send(data);
       }
+      
+      // Mobile optimization: Prevent zoom on double-tap
+      document.addEventListener('touchstart', function(event) {
+        if (event.touches.length > 1) {
+          event.preventDefault();
+        }
+      }, {passive: false});
+      
+      var lastTouchEnd = 0;
+      document.addEventListener('touchend', function(event) {
+        var now = (new Date()).getTime();
+        if (now - lastTouchEnd <= 300) {
+          event.preventDefault();
+        }
+        lastTouchEnd = now;
+      }, false);
+      
+      // Auto-reconnect on page visibility change (mobile background/foreground)
+      document.addEventListener('visibilitychange', function() {
+        if (!document.hidden && (!websocketRobotArmInput || websocketRobotArmInput.readyState !== WebSocket.OPEN)) {
+          console.log('Page became visible, checking WebSocket connection...');
+          setTimeout(initRobotArmInputWebSocket, 1000);
+        }
+      });
 
       
       function onclickButton(button) 
